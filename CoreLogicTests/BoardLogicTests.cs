@@ -6,6 +6,7 @@ using CoreDAL.Dto;
 using CoreLogic;
 using CoreLogic.Dto;
 using CoreService.Dto;
+using CoreWebCommon;
 using CoreWebCommon.Dto;
 using ExpectedObjects;
 using NSubstitute;
@@ -18,12 +19,15 @@ namespace CoreLogicTests
     {
         private IBoardDa _boardDa;
         private BoardLogicForTest _boardLogic;
+        private IMyLogger _logger;
 
         [SetUp]
         public void SetUp()
         {
             _boardDa = Substitute.For<IBoardDa>();
             _boardLogic = new BoardLogicForTest(new Operation(), _boardDa);
+            _logger = Substitute.For<IMyLogger>();
+            _boardLogic.SetLogger(_logger);
         }
 
         [Test]
@@ -53,6 +57,22 @@ namespace CoreLogicTests
                                   new BoardListItem() {Id = "12"},
                                   new BoardListItem() {Id = "14"},
                                   new BoardListItem() {Id = "16"});
+        }
+
+        [Test]
+        public async Task log_warning_settings()
+        {
+            GivenBoardApiResp(true);
+            GivenBoardDataFromDb(
+                new BoardDto() {Id = "11", IsWarning = true, Name = "Joey1"},
+                new BoardDto() {Id = "12", IsWarning = false, Name = "Joey2"},
+                new BoardDto() {Id = "13", IsWarning = true, Name = "Joey3"},
+                new BoardDto() {Id = "14", IsWarning = false, Name = "Joey4"},
+                new BoardDto() {Id = "16", IsWarning = false, Name = "Joey5"});
+
+            var boardList = await WhenGetBoardList();
+
+            _logger.Received(1).Info("Joey1,Joey3");
         }
 
         private static void ResultShouldBe(IsSuccessResult<BoardListDto> boardList, bool isSuccess, string errorMessage)
@@ -104,6 +124,7 @@ namespace CoreLogicTests
     internal class BoardLogicForTest : BoardLogic
     {
         private BoardQueryResp _boardQueryResp;
+        private IMyLogger _logger;
 
         public BoardLogicForTest(Operation operation, IBoardDa da = null) : base(operation, da)
         {
@@ -114,9 +135,19 @@ namespace CoreLogicTests
             return Task.FromResult(_boardQueryResp);
         }
 
+        protected override IMyLogger GetLogger()
+        {
+            return _logger;
+        }
+
         internal void SetBoardQueryResp(BoardQueryResp boardQueryResp)
         {
             _boardQueryResp = boardQueryResp;
+        }
+
+        internal void SetLogger(IMyLogger logger)
+        {
+            _logger = logger;
         }
     }
 }

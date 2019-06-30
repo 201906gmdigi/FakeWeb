@@ -81,6 +81,7 @@
     <Compile Include="Dto\Operation.cs" />
     <Compile Include="Dto\SearchParamDto.cs" />
     <Compile Include="Enum\AuthorityKey.cs" />
+    <Compile Include="IMyLogger.cs" />
     <Compile Include="_BaseController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

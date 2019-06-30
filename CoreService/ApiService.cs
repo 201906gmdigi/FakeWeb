@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
+using CoreWebCommon;
 using NLog;
 
 namespace CoreService
 {
     public class ApiService
     {
-        private readonly Logger _logger;
+        private readonly IMyLogger _logger;
 
-        public ApiService(Logger logger)
+        public ApiService(IMyLogger logger)
         {
             _logger = logger;
         }

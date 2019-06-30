@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using CoreLogic.Dto;
+using CoreWebCommon;
 using CoreWebCommon.Dto;
 using NLog;
 
@@ -15,7 +16,36 @@ namespace CoreLogic
             _operation = operation;
         }
 
-        protected Logger GetLogger()
+        protected virtual IMyLogger GetLogger()
+        {
+            return new NLogAdapter();
+        }
+
+        protected OperationInfo GetOperationInfo()
+        {
+            return new OperationInfo
+            {
+                Display = _operation.Display,
+                IP = _operation.IP,
+                UserId = _operation.UserId
+            };
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public class NLogAdapter : IMyLogger
+    {
+        private readonly Logger _nLogLogger;
+
+        public NLogAdapter()
+        {
+            _nLogLogger = GetNLogLogger();
+        }
+
+        private static Logger GetNLogLogger()
         {
             var fullMethodName = default(string);
 
@@ -31,19 +61,10 @@ namespace CoreLogic
 
             return LogManager.GetLogger(fullMethodName);
         }
-        
-        protected OperationInfo GetOperationInfo()
-        {
-            return new OperationInfo
-            {
-                Display = _operation.Display,
-                IP = _operation.IP,
-                UserId = _operation.UserId
-            };
-        }
 
-        public void Dispose()
+        public void Info(string message)
         {
+            _nLogLogger.Info(message);
         }
     }
 }
