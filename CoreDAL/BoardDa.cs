@@ -6,7 +6,12 @@ using CoreWebCommon.Dto;
 
 namespace CoreDAL
 {
-    public class BoardDa : _BaseDA
+    public interface IBoardDa
+    {
+        List<BoardDto> GetBoardData(IEnumerable<string> ids);
+    }
+
+    public class BoardDa : _BaseDA, IBoardDa
     {
         private readonly Operation _operation;
 

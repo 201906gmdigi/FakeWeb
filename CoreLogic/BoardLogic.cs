@@ -10,9 +10,9 @@ namespace CoreLogic
 {
     public class BoardLogic : _BaseLogic
     {
-        private readonly BoardDa _boardDa;
+        private readonly IBoardDa _boardDa;
 
-        public BoardLogic(Operation operation, BoardDa da = null)
+        public BoardLogic(Operation operation, IBoardDa da = null)
             : base(operation)
         {
             _boardDa = da ?? new BoardDa(operation);
