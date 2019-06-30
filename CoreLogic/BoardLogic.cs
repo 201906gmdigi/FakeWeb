@@ -60,7 +60,8 @@ namespace CoreLogic
 
         protected virtual async Task<BoardQueryResp> BoardQueryResp(BoardQueryDto queryDto)
         {
-            return await ApiService.PostApi<BoardQueryDto, BoardQueryResp>(queryDto);
+            var resp = await ApiService.PostApi<BoardQueryDto, BoardQueryResp>(queryDto);
+            return resp;
         }
     }
 }

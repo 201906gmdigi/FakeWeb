@@ -12,24 +12,47 @@ namespace CoreLogicTests
     [TestFixture]
     public class BoardLogicTests
     {
+        private BoardLogicForTest _boardLogic;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _boardLogic = new BoardLogicForTest(new Operation());
+        }
+
         [Test]
         public async Task board_api_has_error()
         {
-            var boardLogic = new BoardLogicForTest(new Operation());
-            boardLogic.SetBoardQueryResp(new BoardQueryResp()
-            {
-                IsSuccess = false
-            });
+            GivenBoardApiResp(false);
 
-            var boardList = await boardLogic.GetBoardList(new SearchParamDto(), 10);
+            var boardList = await WhenGetBoardList();
 
+            ResultShouldBe(boardList, false, "Error");
+        }
+
+        private static void ResultShouldBe(IsSuccessResult<BoardListDto> boardList, bool isSuccess, string errorMessage)
+        {
             var expected = new IsSuccessResult<BoardListDto>()
             {
-                IsSuccess = false,
-                ErrorMessage = "Error"
+                IsSuccess = isSuccess,
+                ErrorMessage = errorMessage
             };
 
             expected.ToExpectedObject().ShouldMatch(boardList);
+        }
+
+        private async Task<IsSuccessResult<BoardListDto>> WhenGetBoardList()
+        {
+            var boardList = await _boardLogic.GetBoardList(new SearchParamDto(), 10);
+            return boardList;
+        }
+
+        private void GivenBoardApiResp(bool isSuccess)
+        {
+            _boardLogic.SetBoardQueryResp(new BoardQueryResp()
+            {
+                IsSuccess = isSuccess
+            });
         }
     }
 
@@ -41,13 +64,14 @@ namespace CoreLogicTests
         {
         }
 
-        internal void SetBoardQueryResp(BoardQueryResp boardQueryResp)
-        {
-            _boardQueryResp = boardQueryResp;
-        }
         protected override Task<BoardQueryResp> BoardQueryResp(BoardQueryDto queryDto)
         {
             return Task.FromResult(_boardQueryResp);
+        }
+
+        internal void SetBoardQueryResp(BoardQueryResp boardQueryResp)
+        {
+            _boardQueryResp = boardQueryResp;
         }
     }
 }
