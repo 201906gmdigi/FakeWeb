@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreDAL;
 using CoreDAL.Dto;
@@ -39,32 +40,19 @@ namespace CoreLogicTests
         public async Task get_board_list_success_with_3_real_data_and_2_test_data()
         {
             GivenBoardApiResp(true);
-            _boardDa.GetBoardData(new[] {"1"}).ReturnsForAnyArgs(new List<BoardDto>()
-            {
+            GivenBoardDataFromDb(
                 new BoardDto() {Id = "11", IsTest = true},
                 new BoardDto() {Id = "12", IsTest = false},
                 new BoardDto() {Id = "13", IsTest = true},
                 new BoardDto() {Id = "14", IsTest = false},
-                new BoardDto() {Id = "16", IsTest = false},
-            });
+                new BoardDto() {Id = "16", IsTest = false});
 
             var boardList = await WhenGetBoardList();
 
-            var expected = new IsSuccessResult<BoardListDto>()
-            {
-                IsSuccess = true,
-                ReturnObject = new BoardListDto()
-                {
-                    BoardListItems = new List<BoardListItem>
-                    {
-                        new BoardListItem() {Id = "12"},
-                        new BoardListItem() {Id = "14"},
-                        new BoardListItem() {Id = "16"},
-                    }
-                }
-            };
-
-            expected.ToExpectedObject().ShouldMatch(boardList);
+            ResultShouldBeSuccess(boardList,
+                                  new BoardListItem() {Id = "12"},
+                                  new BoardListItem() {Id = "14"},
+                                  new BoardListItem() {Id = "16"});
         }
 
         private static void ResultShouldBe(IsSuccessResult<BoardListDto> boardList, bool isSuccess, string errorMessage)
@@ -76,6 +64,25 @@ namespace CoreLogicTests
             };
 
             expected.ToExpectedObject().ShouldMatch(boardList);
+        }
+
+        private static void ResultShouldBeSuccess(IsSuccessResult<BoardListDto> boardList, params BoardListItem[] items)
+        {
+            var expected = new IsSuccessResult<BoardListDto>()
+            {
+                IsSuccess = true,
+                ReturnObject = new BoardListDto()
+                {
+                    BoardListItems = items.ToList()
+                }
+            };
+
+            expected.ToExpectedObject().ShouldMatch(boardList);
+        }
+
+        private void GivenBoardDataFromDb(params BoardDto[] dtos)
+        {
+            _boardDa.GetBoardData(new[] {"1"}).ReturnsForAnyArgs(dtos.ToList());
         }
 
         private async Task<IsSuccessResult<BoardListDto>> WhenGetBoardList()
