@@ -11,13 +11,14 @@ namespace CoreLogic
     public class BoardLogic : _BaseLogic
     {
         private readonly BoardDa _boardDa;
-        private ApiService ApiService => new ApiService(GetLogger());
 
         public BoardLogic(Operation operation, BoardDa da = null)
             : base(operation)
         {
             _boardDa = da ?? new BoardDa(operation);
         }
+
+        private ApiService ApiService => new ApiService(GetLogger());
 
         public async Task<IsSuccessResult<BoardListDto>> GetBoardList(SearchParamDto search, int pageSize)
         {
@@ -28,7 +29,7 @@ namespace CoreLogic
             };
 
             // Http 呼叫 Service 取得資料
-            var resp = await ApiService.PostApi<BoardQueryDto, BoardQueryResp>(queryDto);
+            var resp = await BoardQueryResp(queryDto);
 
             if (!resp.IsSuccess || resp.Items == null)
                 return new IsSuccessResult<BoardListDto>() {ErrorMessage = "Error", IsSuccess = false};
@@ -55,6 +56,11 @@ namespace CoreLogic
                 IsSuccess = true,
                 ReturnObject = boardListDto
             };
+        }
+
+        protected virtual async Task<BoardQueryResp> BoardQueryResp(BoardQueryDto queryDto)
+        {
+            return await ApiService.PostApi<BoardQueryDto, BoardQueryResp>(queryDto);
         }
     }
 }

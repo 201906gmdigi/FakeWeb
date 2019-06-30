@@ -64,9 +64,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CoreDAL\CoreDAL.csproj">
+      <Project>{80C6F8E4-1337-437A-82FF-D6ED778FE246}</Project>
+      <Name>CoreDAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CoreLogic\CoreLogic.csproj">
       <Project>{0ad5e063-1f52-4116-82c0-a1db2389602b}</Project>
       <Name>CoreLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CoreService\CoreService.csproj">
+      <Project>{C726443A-9688-4B8A-8098-F5FA9176F3D0}</Project>
+      <Name>CoreService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CoreWebCommon\CoreWebCommon.csproj">
+      <Project>{711C4519-8882-480B-A38B-8C98E73093B3}</Project>
+      <Name>CoreWebCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
